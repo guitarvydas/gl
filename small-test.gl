@@ -1,0 +1,10 @@
+{ from: mc
+   { statement: 1111-11-11
+     { year: 2021
+       [
+         [ jul-23 ??? -333.53 pppppp ]
+       ]
+     }
+     balance : 1234.56
+  }
+}

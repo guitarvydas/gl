@@ -1,0 +1,92 @@
+gl {
+
+GL = "{" "from:" ident Statement+ "}"
+Statement = "{" "statement:" Date YearStatement+  Balance? "}"
+YearStatement = "{" "year:" Year "[" Transaction+ "]" "}"
+
+Transaction = "[" ShortDate Account Amount Description "]"
+
+Account = "???" | ident
+
+Amount = NegativeAmount | PositiveAmount
+Description = string | ident
+
+Balance = "balance" ":" Amount
+
+Date = Year "-" ShortDate
+Year = dec dec dec dec 
+ShortDate = Month "-" dec dec
+Month = NamedMonth | DecimalMonth
+DecimalMonth = dec dec
+NamedMonth =   January | February | March | April | May | June
+             | July | August | September | October | November | December
+
+string = "\"" notQ+ "\""
+ident = idchar+
+
+NegativeAmount = "-" PositiveAmount
+PositiveAmount = dec+ "." dec dec
+January = "january" | "jan"
+February = "february" | "feb"
+March = "march" | "mar"
+April = "april" | "apr"
+May = "may" | "may"
+June = "june" | "jun"
+July = "july" | "jul"
+August = "august" | "aug"
+September = "septemer" | "sept" | "sep"
+October = "october" | "oct"
+November = "november" | "nov"
+December = "december" | "dec"
+
+dec = "0" .. "9"
+notQ = ~eol ~"\"" any
+idchar = ~eol ~" " any
+
+comment = ";" ~"\n" any*
+eol = "\n" | end
+}
+
+GL [_lb from ident @statement _rb] = [[${_lb}${from}${ident}${statement}${_rb}]]
+Statement [_lb _statement data @ys bal _rb] = [[${_lb}${_statement}${data}${ys}${bal}${_rb}]]
+
+YearStatement [_lb _year year _l @tx _r _rb] = [[${_lb}${_year}${year}${_l}${tx}${_r}${_rb}]]
+
+Transaction [ _l sd acc amt desc _r] = [[${_l}${sd}${acc}${amt}${desc}${_r}]]
+
+Account [x] = [[${x}]]
+Amount [x] = [[${x}]]
+Description [x] = [[${x}]]
+
+Balance [_bal _ amt] = [[${_bal}${_}${amt}]]
+
+Date [year _ shortdate] = [[${year}${_}${shortdate}]]
+Year [a b c d] = [[${a}${b}${c}${d}]]
+Month [m] = [[${m}]]
+DecimalMonth [a b] = [[${a}${b}]]
+NamedMonth [m] = [[${m}]]
+
+string [_l @cs _r] = [[${_l}${cs}${r}]]
+ident [@cs] = [[${cs}]]
+
+NegativeAmount [_ a] = [[${_}${a}]] 
+PositiveAmount [@i _dot f1 f2] = [[${i}{_dot}${f1}${f2}]]
+January [s] = [[january]]
+February [s] = [[february]]
+March [s] = [[march]]
+April [s] = [[april]]
+May [s] = [[may]]
+June [s] = [[june]]
+July [s] = [[july]]
+August [s] = [[august]]
+September [s] = [[septemer]]
+October [s] = [[october]]
+November [s] = [[november]]
+December [s] = [[december]]
+
+dec [d] = [[${d}]]
+notQ [c] ] [[${c}]]
+idchar [c] = [[${c}]]
+
+comment [_ @cs] = [[;${cs}]]
+eol [c] = [[${c}]]
