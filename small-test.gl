@@ -2,7 +2,7 @@
    { statement: 1111-11-11
      { year: 2021
        [
-         [ jul-23 ??? -333.53 pppppp ]
+         [ jul-23 ??? -333.53 pppppp {hst : 1}]
        ]
      }
      balance: 1234.56

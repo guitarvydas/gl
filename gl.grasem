@@ -3,9 +3,11 @@ GL = "{" "from:" ident Statement+ "}"
 Statement = "{" "statement:" Date YearStatement+  Balance? "}"
 YearStatement = "{" "year:" year "[" Transaction+ "]" "}"
 
-Transaction = "[" ShortDate Account Amount Description "]"
+Transaction = "[" ShortDate Account Amount Description Flag* "]"
 
 Account = "???" | ident
+
+Flag = "{" ident ":" Amount "}"
 
 Amount = NegativeAmount | PositiveAmount
 Description = string | ident
@@ -24,7 +26,9 @@ string = "\"" notQ+ "\""
 ident = idchar+
 
 NegativeAmount = "-" PositiveAmount
-PositiveAmount = dec+ "." dec dec
+PositiveAmount = positiveFloat | int
+positiveFloat = int "." dec dec
+int = dec+
 January = "january" | "jan"
 February = "february" | "feb"
 March = "march" | "mar"
@@ -40,7 +44,7 @@ December = "december" | "dec"
 
 dec = "0" .. "9"
 notQ = ~eol ~"\"" any
-idchar = ~eol ~" " any
+idchar (id char)= ~eol ~" " ("A" .. "Z" | "a" .. "z" | "_" | "0" .. "9")
 
 comment = ";" ~"\n" any*
 eol = "\n" | end
@@ -51,7 +55,7 @@ Statement [_lb _statement data @ys bal _rb] = [[${_lb} ${_statement} ${data} ${y
 
 YearStatement [lb_ yr_ yr l_ @tx r_ rb_] = [[${lb_}${yr_} ${yr} ${l_}${tx}${r_}${rb_}]]
 
-Transaction [ _l sd acc amt desc _r] = [[${_l} ${sd} ${acc} ${amt} ${desc}${_r}]]
+Transaction [ _l sd acc amt desc @flags _r] = [[${_l} ${sd} ${acc} ${amt} ${desc} ${flags} ${_r}]]
 
 Account [x] = [[${x}]]
 Amount [x] = [[${x}]]
@@ -66,11 +70,15 @@ Month [m] = [[${m}]]
 DecimalMonth [a b] = [[${a}${b}]]
 NamedMonth [m] = [[${m}]]
 
-string [_l @cs _r] = [[${_l}${cs}${r}]]
+string [l @cs r] = [[${l}${cs}${r}]]
 ident [@cs] = [[${cs}]]
 
 NegativeAmount [_ a] = [[${_}${a}]] 
-PositiveAmount [@i _dot f1 f2] = [[${i}${_dot}${f1}${f2}]]
+
+PositiveAmount [v] = [[${v}]]
+positiveFloat [i dot d1 d2] = [[${i}${dot}${d1}${d2}]]
+int [@d] = [[${d}]]
+
 January [s] = [[january]]
 February [s] = [[february]]
 March [s] = [[march]]
@@ -90,3 +98,5 @@ idchar [c] = [[${c}]]
 
 comment [_ @cs] = [[${_}${cs}]]
 eol [c] = [[${c}]]
+
+Flag [lb id colon amt rb] = [[${lb}${id} ${colon} ${amt}${rb}]]
