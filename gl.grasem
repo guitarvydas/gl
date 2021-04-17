@@ -1,8 +1,7 @@
 gl {
-
 GL = "{" "from:" ident Statement+ "}"
 Statement = "{" "statement:" Date YearStatement+  Balance? "}"
-YearStatement = "{" "year:" Year "[" Transaction+ "]" "}"
+YearStatement = "{" "year:" year "[" Transaction+ "]" "}"
 
 Transaction = "[" ShortDate Account Amount Description "]"
 
@@ -11,10 +10,10 @@ Account = "???" | ident
 Amount = NegativeAmount | PositiveAmount
 Description = string | ident
 
-Balance = "balance" ":" Amount
+Balance = "balance:" Amount
 
-Date = Year "-" ShortDate
-Year = dec dec dec dec 
+Date = year "-" ShortDate
+year = dec dec dec dec 
 ShortDate = Month "-" dec dec
 Month = NamedMonth | DecimalMonth
 DecimalMonth = dec dec
@@ -47,21 +46,22 @@ comment = ";" ~"\n" any*
 eol = "\n" | end
 }
 
-GL [_lb from ident @statement _rb] = [[${_lb}${from}${ident}${statement}${_rb}]]
-Statement [_lb _statement data @ys bal _rb] = [[${_lb}${_statement}${data}${ys}${bal}${_rb}]]
+GL [_lb from ident @statement _rb] = [[${_lb}${from} ${ident} ${statement}${_rb}]]
+Statement [_lb _statement data @ys bal _rb] = [[${_lb} ${_statement} ${data} ${ys} ${bal} ${_rb}]]
 
-YearStatement [_lb _year year _l @tx _r _rb] = [[${_lb}${_year}${year}${_l}${tx}${_r}${_rb}]]
+YearStatement [lb_ yr_ yr l_ @tx r_ rb_] = [[${lb_}${yr_} ${yr} ${l_}${tx}${r_}${rb_}]]
 
-Transaction [ _l sd acc amt desc _r] = [[${_l}${sd}${acc}${amt}${desc}${_r}]]
+Transaction [ _l sd acc amt desc _r] = [[${_l} ${sd} ${acc} ${amt} ${desc}${_r}]]
 
 Account [x] = [[${x}]]
 Amount [x] = [[${x}]]
 Description [x] = [[${x}]]
 
-Balance [_bal _ amt] = [[${_bal}${_}${amt}]]
+Balance [_bal amt] = [[${_bal} ${amt}]]
 
-Date [year _ shortdate] = [[${year}${_}${shortdate}]]
-Year [a b c d] = [[${a}${b}${c}${d}]]
+Date [yr _ shortdate] = [[${yr}${_}${shortdate}]]
+year [a b c d] = [[${a}${b}${c}${d}]]
+ShortDate [m _ a b] = [[${m}${_}${a}${b}]]
 Month [m] = [[${m}]]
 DecimalMonth [a b] = [[${a}${b}]]
 NamedMonth [m] = [[${m}]]
@@ -70,7 +70,7 @@ string [_l @cs _r] = [[${_l}${cs}${r}]]
 ident [@cs] = [[${cs}]]
 
 NegativeAmount [_ a] = [[${_}${a}]] 
-PositiveAmount [@i _dot f1 f2] = [[${i}{_dot}${f1}${f2}]]
+PositiveAmount [@i _dot f1 f2] = [[${i}${_dot}${f1}${f2}]]
 January [s] = [[january]]
 February [s] = [[february]]
 March [s] = [[march]]
@@ -85,8 +85,8 @@ November [s] = [[november]]
 December [s] = [[december]]
 
 dec [d] = [[${d}]]
-notQ [c] ] [[${c}]]
+notQ [c] = [[${c}]]
 idchar [c] = [[${c}]]
 
-comment [_ @cs] = [[;${cs}]]
+comment [_ @cs] = [[${_}${cs}]]
 eol [c] = [[${c}]]
